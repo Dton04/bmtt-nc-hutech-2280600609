@@ -1,40 +1,43 @@
 class RailFenceCipher:
-    def __init__(self):
-        pass
-
-    def encrypt(self, text, key):
-        # Tạo các hàng cho Rail Fence
-        rail = [['\n' for _ in range(len(text))] for _ in range(key)]
-        direction_down = False
+    def rail_fence_encrypt(self, plain_text, key):
+        # Tạo bảng zigzag
+        rail = [['\n' for _ in range(len(plain_text))] for _ in range(key)]
+        dir_down = False
         row, col = 0, 0
 
-        # Điền các ký tự vào Rail Fence
-        for char in text:
+        # Điền dữ liệu vào bảng zigzag
+        for char in plain_text:
             if row == 0 or row == key - 1:
-                direction_down = not direction_down
+                dir_down = not dir_down
             rail[row][col] = char
             col += 1
-            row += 1 if direction_down else -1
+            row += 1 if dir_down else -1
 
-        # Đọc các ký tự theo thứ tự hàng
-        encrypted_text = ''.join([''.join(row) for row in rail if row])
-        return encrypted_text
+        # Đọc dữ liệu từ bảng zigzag
+        encrypted_text = []
+        for i in range(key):
+            for j in range(len(plain_text)):
+                if rail[i][j] != '\n':
+                    encrypted_text.append(rail[i][j])
+        return ''.join(encrypted_text)
 
-    def decrypt(self, cipher_text, key):
-        # Tạo các hàng cho Rail Fence
+    def rail_fence_decrypt(self, cipher_text, key):
+        # Tạo bảng zigzag
         rail = [['\n' for _ in range(len(cipher_text))] for _ in range(key)]
-        direction_down = None
+        dir_down = None
         row, col = 0, 0
 
-        # Đánh dấu vị trí các ký tự
-        for _ in cipher_text:
-            if row == 0 or row == key - 1:
-                direction_down = not direction_down
+        # Đánh dấu vị trí zigzag
+        for _ in range(len(cipher_text)):
+            if row == 0:
+                dir_down = True
+            if row == key - 1:
+                dir_down = False
             rail[row][col] = '*'
             col += 1
-            row += 1 if direction_down else -1
+            row += 1 if dir_down else -1
 
-        # Điền các ký tự vào Rail Fence
+        # Điền dữ liệu vào bảng zigzag
         index = 0
         for i in range(key):
             for j in range(len(cipher_text)):
@@ -42,15 +45,16 @@ class RailFenceCipher:
                     rail[i][j] = cipher_text[index]
                     index += 1
 
-        # Đọc các ký tự theo thứ tự zigzag
+        # Đọc dữ liệu từ bảng zigzag
         result = []
         row, col = 0, 0
-        for _ in cipher_text:
-            if row == 0 or row == key - 1:
-                direction_down = not direction_down
-            if rail[row][col] != '*':
+        for _ in range(len(cipher_text)):
+            if row == 0:
+                dir_down = True
+            if row == key - 1:
+                dir_down = False
+            if rail[row][col] != '\n':
                 result.append(rail[row][col])
                 col += 1
-            row += 1 if direction_down else -1
-
+            row += 1 if dir_down else -1
         return ''.join(result)
